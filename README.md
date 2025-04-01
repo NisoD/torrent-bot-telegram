@@ -1,7 +1,7 @@
 ![PoC GIF](PoC.gif)
 # Telegram Torrent Bot
 
-A professional Telegram bot that downloads torrents from magnet links using the [Rain](https://github.com/cenkalti/rain) library.
+A Telegram bot that downloads torrents from magnet links using the [Rain](https://github.com/cenkalti/rain) library.
 
 ## Features
 
@@ -9,7 +9,7 @@ A professional Telegram bot that downloads torrents from magnet links using the 
 - Select specific files from torrents to download
 - Real-time download progress updates
 - File upload back to Telegram when complete
-- Comprehensive logging system
+- Extensive logging system
 - Containerized with Docker for easy deployment
 
 ## Project Structure
@@ -32,8 +32,8 @@ A professional Telegram bot that downloads torrents from magnet links using the 
 
 ## Requirements
 
-- Go 1.16+ (for local development)
-- Docker and Docker Compose (for containerized deployment)
+- Go 1.22+ 
+- Docker and Docker Compose 
 - Telegram Bot Token (from [@BotFather](https://t.me/BotFather))
 
 ## Quick Start
@@ -53,7 +53,6 @@ A professional Telegram bot that downloads torrents from magnet links using the 
    ```bash
    make run
    ```
-
 ### Docker Deployment
 
 1. Set up environment:
@@ -93,28 +92,17 @@ A professional Telegram bot that downloads torrents from magnet links using the 
    - Or send "all" to download everything
 5. The bot will download your files and upload them back to you
 
-## Advanced Configuration
-
-For advanced configuration options, you can modify the Docker and application settings:
-
-- Change volume mount points in `docker-compose.yml`
-- Adjust application parameters in the `.env` file
-- Modify bot behavior in the source code
-
 ## Troubleshooting
-
-Common issues:
 
 - **Bot not responding**: Check your `TELEGRAM_BOT_TOKEN` and ensure the bot is running
 - **Download failures**: Some torrents may have few or no seeds
 - **Upload failures**: Telegram has a 50MB file size limit for bots
-
-Check the logs folder for detailed error information.
+  > Can be modified for group usage for a higher limit of 2GB.
 
 ## License
 
 MIT
 
-## Disclaimer
+# Disclaimer
 
 This tool is intended for downloading and sharing legal content only. Users are responsible for complying with all applicable copyright laws.
