@@ -11,7 +11,7 @@ import (
 	"github.com/cenkalti/rain/torrent"
 )
 
-// DownloadProgress represents the current state of a download
+// DownloadProgress - state of a download
 type DownloadProgress struct {
 	Status          string
 	PercentComplete float64
@@ -20,7 +20,7 @@ type DownloadProgress struct {
 	Peers           int
 }
 
-// TorrentFile represents a file in a torrent
+// File with it's path
 type TorrentFile struct {
 	ID       int
 	Name     string
@@ -28,7 +28,7 @@ type TorrentFile struct {
 	Selected bool
 }
 
-// Downloader handles torrent downloads
+// Handler
 type Downloader struct {
 	session      *torrent.Session
 	torrent      *torrent.Torrent
@@ -38,7 +38,6 @@ type Downloader struct {
 	mu           sync.Mutex
 }
 
-// NewDownloader creates a new downloader
 func NewDownloader(downloadPath string, logger *Logger) *Downloader {
 	if logger == nil {
 		// Create a default logger that outputs to stdout if none provided
@@ -57,11 +56,11 @@ func (d *Downloader) GetTorrentInfo(magnetLink string) ([]TorrentFile, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	// Create a session config
+	// session config
 	cfg := torrent.DefaultConfig
 	cfg.DataDir = d.downloadPath
 
-	// Create a new session
+	// new session
 	ses, err := torrent.NewSession(cfg)
 	if err != nil {
 		d.logger.LogError("Failed to create torrent session: %v", err)
@@ -77,7 +76,7 @@ func (d *Downloader) GetTorrentInfo(magnetLink string) ([]TorrentFile, error) {
 	}
 	d.torrent = tor
 
-	// Wait for metadata
+	// Wait for metadata and inform user
 	d.logger.LogInfo("Fetching torrent metadata...")
 	metadataComplete := make(chan struct{})
 	go func() {
@@ -92,11 +91,11 @@ func (d *Downloader) GetTorrentInfo(magnetLink string) ([]TorrentFile, error) {
 		}
 	}()
 
-	// Wait with timeout
+	
 	select {
 	case <-metadataComplete:
 		// Metadata fetched successfully
-	case <-time.After(60 * time.Second):
+	case <-time.After(60 * time.Second): // This can be prolonged for rare low seed usage
 		return nil, errors.New("timeout while fetching torrent metadata")
 	}
 
@@ -116,13 +115,12 @@ func (d *Downloader) GetTorrentInfo(magnetLink string) ([]TorrentFile, error) {
 			Selected: true,
 		}
 	}
-	// Stop the torrent for now
+	
 	tor.Stop()
-
 	return d.files, nil
 }
 
-// SelectFiles updates the selection status of files
+// Important Feature - Lets user select files to download (Not availabe for IOS users in ISH + rtorrent usage) 
 func (d *Downloader) SelectFiles(fileIDs []int) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -131,7 +129,7 @@ func (d *Downloader) SelectFiles(fileIDs []int) error {
 		return errors.New("no active torrent")
 	}
 
-	// Create a map for quick lookup
+	// map for quick lookup 
 	selectedMap := make(map[int]bool)
 	for _, id := range fileIDs {
 		selectedMap[id] = true
@@ -142,11 +140,11 @@ func (d *Downloader) SelectFiles(fileIDs []int) error {
 		d.files[i].Selected = selectedMap[i]
 	}
 
-	//File selection is done by the torrent client, and not by setting priorities.
-	//The torrent client will download the files selected by default.
-	//If some files are not selected, then the torrent client will skip them.
-	//The d.files array contain the selected files.
-	//No need to do anything here.
+	/**File selection is done by the torrent client, and not by setting priorities 
+	The torrent client will download the files selected by default
+	if not selected they are skiped 
+	The d.files array contain the selected files
+	**/
 	return nil
 }
 
@@ -156,19 +154,18 @@ func (d *Downloader) Download() (chan DownloadProgress, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	// Ensure torrent is set
+	// torrent is set
 	if d.torrent == nil {
 		return nil, errors.New("no active torrent")
 	}
 
-	// Create a progress channel
+	// To update user of the prog we make a channel
 	progressChan := make(chan DownloadProgress)
 
-	// Start the torrent
 	d.torrent.Start()
 	d.logger.LogInfo("Starting download of selected files")
 
-	// Start a goroutine to monitor progress
+	// goroutine for monitoring progress
 	go func() {
 		defer close(progressChan)
 
@@ -179,16 +176,14 @@ func (d *Downloader) Download() (chan DownloadProgress, error) {
 				return
 			}
 
-			// Get stats
 			s := d.torrent.Stats()
-
-			// Calculate percentage
+			// Precentage for readability
 			var percentComplete float64
 			if s.Bytes.Total > 0 {
 				percentComplete = float64(s.Bytes.Completed) / float64(s.Bytes.Total) * 100
 			}
 
-			// Send progress update
+			// user is updated
 			progressInfo := DownloadProgress{
 				Status:          s.Status.String(),
 				PercentComplete: percentComplete,
@@ -199,13 +194,13 @@ func (d *Downloader) Download() (chan DownloadProgress, error) {
 
 			progressChan <- progressInfo
 
-			// Log progress periodically (every 10%)
+			// Proggress update can be more/less 
 			if int(percentComplete)%10 == 0 {
 				d.logger.LogInfo("Download progress: %.2f%% (Status: %s, Peers: %d)",
 					percentComplete, s.Status.String(), s.Peers.Total)
 			}
 
-			// If download is complete, exit loop
+			// if seeding download is done
 			if s.Status == torrent.Seeding {
 				d.logger.LogInfo("Download complete")
 				return
