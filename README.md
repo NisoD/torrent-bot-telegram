@@ -1,3 +1,4 @@
+![PoC GIF](PoC.gif)
 # Telegram Torrent Bot
 
 A professional Telegram bot that downloads torrents from magnet links using the [Rain](https://github.com/cenkalti/rain) library.
