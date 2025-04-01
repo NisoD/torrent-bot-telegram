@@ -1,0 +1,26 @@
+
+---
+
+### **🛑 .gitignore (for Go projects)**  
+
+Create a `.gitignore` file:  
+
+```gitignore
+# Binaries & build files
+*.exe
+*.out
+*.a
+*.o
+*.so
+*.test
+
+# Dependencies
+vendor/
+
+# Go workspace files
+go.work
+go.work.sum
+
+# Environment files
+.env
+
