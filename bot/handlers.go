@@ -84,7 +84,7 @@ func (b *Bot) handleMessage(message *tgbotapi.Message) {
 		b.handleFileSelection(message, session)
 
 	default:
-		// Default behavior - check if it's a magnet link
+		//check if it's a magnet link
 		if strings.HasPrefix(message.Text, "magnet:") {
 			b.handleMagnetLink(message, session)
 		} else {
@@ -365,7 +365,8 @@ func (b *Bot) uploadFiles(chatID int64, files []server.TorrentFile) {
 	b.Config.API.Send(completeMsg)
 }
 
-// isTextFile checks if the file extension indicates a text file
+//  the file extension indicates a text file (able to upload)
+// TODO: Extend for audio files
 func isTextFile(ext string) bool {
 	textExtensions := map[string]bool{
 		".txt":  true,
