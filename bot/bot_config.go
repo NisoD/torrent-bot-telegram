@@ -8,21 +8,20 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-// BotConfig holds the configuration for the Telegram bot
+// TODO: Extend bot config for further usage
 type BotConfig struct {
 	Token     string
 	API       *tgbotapi.BotAPI
 	AppConfig *config.Config
 }
 
-// NewBotConfig creates a new bot configuration
 func NewBotConfig(cfg *config.Config, logger *server.Logger) (*BotConfig, error) {
 	bot, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
 	if err != nil {
 		return nil, err
 	}
 
-	// Set debugging mode (optional)
+	// optional debugging
 	bot.Debug = true
 	logger.LogInfo("Authorized on account %s", bot.Self.UserName)
 	log.Printf("Authorized on account %s", bot.Self.UserName)
