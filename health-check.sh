@@ -3,23 +3,22 @@
 # Telegram Torrent Bot health check script
 set -e
 
-# Colors for output
+# Colors for pro logging showoff
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Check if Docker is running
+# Docker Status
 if ! docker info &>/dev/null; then
     echo -e "${RED}[ERROR]${NC} Docker is not running!"
     exit 1
 fi
 
-# Check if the container is running
+# Container Status
 if [ "$(docker ps -q -f name=telegram-torrent-bot)" ]; then
     echo -e "${GREEN}[OK]${NC} Container is running"
     
-    # Get container stats in one call
     STATS=$(docker stats --no-stream --format "{{.CPUPerc}} {{.MemUsage}}" telegram-torrent-bot)
     CPU=$(echo "$STATS" | awk '{print $1}')
     MEM=$(echo "$STATS" | awk '{print $2, $3}')
@@ -27,7 +26,7 @@ if [ "$(docker ps -q -f name=telegram-torrent-bot)" ]; then
     echo -e "${GREEN}[INFO]${NC} CPU Usage: $CPU"
     echo -e "${GREEN}[INFO]${NC} Memory Usage: $MEM"
     
-    # Check logs for errors in the last hour
+    # Error Logs in last hour
     ERROR_COUNT=$(docker logs --since 1h telegram-torrent-bot 2>&1 | grep -c "ERROR" || true)
     if [ "$ERROR_COUNT" -gt 0 ]; then
         echo -e "${YELLOW}[WARNING]${NC} Found $ERROR_COUNT errors in the logs in the last hour"
@@ -35,7 +34,7 @@ if [ "$(docker ps -q -f name=telegram-torrent-bot)" ]; then
         echo -e "${GREEN}[OK]${NC} No errors found in recent logs"
     fi
     
-    # Check disk space (handle missing directories)
+    # du for scaling 
     DOWNLOADS_SIZE=$(du -sh downloads 2>/dev/null | cut -f1 || echo "0B")
     LOGS_SIZE=$(du -sh logs 2>/dev/null | cut -f1 || echo "0B")
     
