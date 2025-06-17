@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	
+
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
@@ -52,6 +52,6 @@ func main() {
 	// Wait for interrupt signal
 	<-c
 	logger.LogInfo("Shutdown signal received, closing bot...")
-	# TODO: MVP-2 Add cleanup 
+	// TODO: MVP-2 Add cleanup
 	logger.LogInfo("Bot shutdown complete")
 }
