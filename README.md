@@ -33,36 +33,45 @@ A Telegram bot  to download torrents directly using magnet links, powered by the
 ```
 
 ```mermaid
-graph TD
-    A[User]
-    B[Telegram API]
-
-    subgraph Docker_Host
-        direction LR
-        subgraph telegram-bot_container
-            C[Go App: telegram-bot binary]
-            D[Torrent Client: rain]
+graph TB
+    %% External actors
+    User[👤 User]
+    TelegramAPI[☁️ Telegram API]
+    Internet[🌐 Internet]
+    
+    %% Docker environment
+    subgraph Docker["🐳 Docker Host"]
+        subgraph Container["📦 telegram-bot Container"]
+            GoApp[🔧 Go Application<br/>telegram-bot binary]
+            TorrentClient[⬇️ Torrent Client<br/>cenkalti/rain]
         end
-        V1[downloads Volume]
-        V2[logs Volume]
+        
+        subgraph Volumes["💾 Host Volumes"]
+            Downloads[📁 ./downloads]
+            Logs[📋 ./logs]
+        end
     end
-
-    %% Define interactions (no list-like labels)
-    A -- "Send magnet link/command" --> B
-    B -- "Forward message" --> C
-    C -- "Process command" --> D
-    D -- "Fetch torrent data" --> E((Internet))
-    D -- "Save files" --> V1
-    C -- "Write logs" --> V2
-    C -- "Send progress/files back" --> B
-    B -- "Deliver to user" --> A
-
+    
+    %% Flow steps
+    User -->|"1️⃣ Send magnet link"| TelegramAPI
+    TelegramAPI -->|"2️⃣ Forward message"| GoApp
+    GoApp -->|"3️⃣ Parse & validate"| TorrentClient
+    TorrentClient -.->|"4️⃣ Download torrent"| Internet
+    TorrentClient -->|"5️⃣ Save files"| Downloads
+    GoApp -->|"6️⃣ Write logs"| Logs
+    GoApp -->|"7️⃣ Send status/files"| TelegramAPI
+    TelegramAPI -->|"8️⃣ Deliver response"| User
+    
     %% Styling
-    style C stroke-width:2px, stroke:#007BFF
-    style D stroke-width:2px, stroke:#28a745
-    linkStyle 4 stroke-width:2px,stroke:grey,stroke-dasharray: 3 3
-    linkStyle 5 stroke-width:2px,stroke:orange,stroke-dasharray: 5 5
-    linkStyle 6 stroke-width:2px,stroke:purple,stroke-dasharray: 5 5
+    classDef userStyle fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef apiStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef appStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef storageStyle fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    
+    class User userStyle
+    class TelegramAPI apiStyle
+    class GoApp,TorrentClient appStyle
+    class Downloads,Logs storageStyle
 ```
 
 
