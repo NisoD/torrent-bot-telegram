@@ -31,41 +31,43 @@ A Telegram bot  to download torrents directly using magnet links, powered by the
 ├── main.go             # Application entry point
 └── Makefile            # Build and run automation
 ```
+
 ```mermaid
 graph TD
     %% Define actors and systems
-    A[<img src="[https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/user.svg](https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/user.svg)" width="50" /> <br> User]
-    B[<img src="[https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cloud.svg](https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cloud.svg)" width="50" /> <br> Telegram API]
+    A[User]
+    B[Telegram API]
 
-    subgraph Docker Host
+    subgraph Docker_Host
         direction LR
-        %% Define the main container
-        subgraph Container: telegram-bot
-            C{Go Application <br> (telegram-bot binary)}
-            D[Embedded Torrent Client <br> (cenkalti/rain)]
+
+        subgraph telegram-bot_container
+            C[Go App: telegram-bot binary]
+            D[Torrent Client: rain]
         end
 
-        %% Define volumes on the host
-        V1[./downloads Volume]
-        V2[./logs Volume]
+        V1[downloads Volume]
+        V2[logs Volume]
     end
 
-    %% Define interactions (arrows)
-    A -- 1. Sends magnet link/command --> B
-    B -- 2. Forwards message --> C
-    C -- 3. Processes command --> D
-    D -- 4. Fetches torrent data --> E((Internet))
-    D -- 5. Saves files --> V1
-    C -- 6. Writes logs --> V2
-    C -- 7. Sends progress/files back --> B
-    B -- 8. Delivers to --> A
+    %% Define interactions
+    A -- "1. Sends magnet link/command" --> B
+    B -- "2. Forwards message" --> C
+    C -- "3. Processes command" --> D
+    D -- "4. Fetches torrent data" --> E((Internet))
+    D -- "5. Saves files" --> V1
+    C -- "6. Writes logs" --> V2
+    C -- "7. Sends progress/files back" --> B
+    B -- "8. Delivers to" --> A
 
-    %% Style the links to show volume mounts
+    %% Styling (some GitHub renderers might ignore these)
     style C stroke-width:2px, stroke:#007BFF
     style D stroke-width:2px, stroke:#28a745
-    linkStyle 4 stroke-width:2px,stroke:grey,stroke-dasharray: 3 3;
-    linkStyle 5 stroke-width:2px,stroke:orange,stroke-dasharray: 5 5;
-    linkStyle 6 stroke-width:2px,stroke:purple,stroke-dasharray: 5 5;
+    linkStyle 4 stroke-width:2px,stroke:grey,stroke-dasharray: 3 3
+    linkStyle 5 stroke-width:2px,stroke:orange,stroke-dasharray: 5 5
+    linkStyle 6 stroke-width:2px,stroke:purple,stroke-dasharray: 5 5
+```
+
 
 ## Requirements 
 
