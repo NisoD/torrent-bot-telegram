@@ -34,33 +34,30 @@ A Telegram bot  to download torrents directly using magnet links, powered by the
 
 ```mermaid
 graph TD
-    %% Define actors and systems
     A[User]
     B[Telegram API]
 
     subgraph Docker_Host
         direction LR
-
         subgraph telegram-bot_container
             C[Go App: telegram-bot binary]
             D[Torrent Client: rain]
         end
-
         V1[downloads Volume]
         V2[logs Volume]
     end
 
-    %% Define interactions
-    A -- "1. Sends magnet link/command" --> B
-    B -- "2. Forwards message" --> C
-    C -- "3. Processes command" --> D
-    D -- "4. Fetches torrent data" --> E((Internet))
-    D -- "5. Saves files" --> V1
-    C -- "6. Writes logs" --> V2
-    C -- "7. Sends progress/files back" --> B
-    B -- "8. Delivers to" --> A
+    %% Define interactions (no list-like labels)
+    A -- "Send magnet link/command" --> B
+    B -- "Forward message" --> C
+    C -- "Process command" --> D
+    D -- "Fetch torrent data" --> E((Internet))
+    D -- "Save files" --> V1
+    C -- "Write logs" --> V2
+    C -- "Send progress/files back" --> B
+    B -- "Deliver to user" --> A
 
-    %% Styling (some GitHub renderers might ignore these)
+    %% Styling
     style C stroke-width:2px, stroke:#007BFF
     style D stroke-width:2px, stroke:#28a745
     linkStyle 4 stroke-width:2px,stroke:grey,stroke-dasharray: 3 3
